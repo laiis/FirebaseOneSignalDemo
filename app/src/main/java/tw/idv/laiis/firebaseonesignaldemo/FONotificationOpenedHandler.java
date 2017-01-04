@@ -1,5 +1,7 @@
 package tw.idv.laiis.firebaseonesignaldemo;
 
+import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.onesignal.OSNotificationAction;
@@ -16,18 +18,33 @@ class FONotificationOpenedHandler implements OneSignal.NotificationOpenedHandler
     // This fires when a notification is opened by tapping on it.
     @Override
     public void notificationOpened(OSNotificationOpenResult result) {
+        Log.i(FOApplication.TAG, " ---> notificationOpened");
+
         OSNotificationAction.ActionType actionType = result.action.type;
         JSONObject data = result.notification.payload.additionalData;
         String customKey;
 
         if (data != null) {
-            customKey = data.optString("customkey", null);
+            customKey = data.optString(" customkey", null);
             if (customKey != null)
-                Log.i(FOApplication.TAG, "customkey set with value: " + customKey);
+                Log.i(FOApplication.TAG, " ---> customkey set with value: " + customKey);
         }
 
-        if (actionType == OSNotificationAction.ActionType.ActionTaken)
+        if (actionType == OSNotificationAction.ActionType.ActionTaken) {
             Log.i(FOApplication.TAG, "Button pressed with id: " + result.action.actionID);
+        } else {
+            Intent intent = new Intent()
+                    .setClass(FOApplication.getAppCtx(), MainActivity.class)
+                    .setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (data != null) {
+                String rawJson = data.toString();
+                Bundle bundle = new Bundle();
+                bundle.putString("payload", rawJson);
+                intent.putExtras(bundle);
+            }
+            FOApplication.getAppCtx().startActivity(intent);
+            Log.i(FOApplication.TAG, " ---> startActivity");
+        }
         // The following can be used to open an Activity of your choice.
         // Replace - getApplicationContext() - with any Android Context.
         // Intent intent = new Intent(getApplicationContext(), YourActivity.class);

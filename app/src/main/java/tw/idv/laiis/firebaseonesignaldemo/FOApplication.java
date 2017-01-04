@@ -12,9 +12,16 @@ public class FOApplication extends Application {
 
     public static final String TAG = FOApplication.class.getName();
 
+    private static volatile FOApplication sContext;
+
+    public static FOApplication getAppCtx() {
+        return sContext;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
+        sContext = this;
         initialOnesignal();
     }
 
